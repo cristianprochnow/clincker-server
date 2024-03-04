@@ -24,3 +24,5 @@ Então pode ser resumido a cadastro, análise de acesso e também comportamento 
 ## Tecnologias
 
 Para construir esse serviço, será usada **Golang**, que vai proporcionar velocidade e praticidade. Além disso, a aplicação será composta por um conjunto de serviços, sendo então essa API e também envio de e-mail.
+
+Ao redor disso, será usado também um banco de dados **MySQL/MariaDB**, que proporciona uma forma prática e performática de guardar os dados e realizar as consultas de _hash_.
