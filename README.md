@@ -13,6 +13,8 @@ O principal objetivo é proporcionar uma sequência de rotas e recursos para que
 
 Então após cadastrar as URLs, o usuário terá também recurso para obter informações mais detalhadas e também validação dos _hashes_ criados no processamento.
 
+![Diagrama de Funcionamento da API](.github/clincker-server.jpg)
+
 ### Escopo
 
 O fluxo se resume ao cadastro de usuário ou então login. Com o resultado dessas rotas, ocorre o usuário que poderá então cadastrar quantas URLs desejar.
