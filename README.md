@@ -1,4 +1,4 @@
-# Clinker (Web)
+# Clincker (Web)
 🔗 URL Shortener in an easy and quick way.
 
 ## Sobre
