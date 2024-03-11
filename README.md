@@ -28,3 +28,23 @@ Então pode ser resumido a cadastro, análise de acesso e também comportamento 
 Para construir esse serviço, será usada **Golang**, que vai proporcionar velocidade e praticidade. Além disso, a aplicação será composta por um conjunto de serviços, sendo então essa API e também envio de e-mail.
 
 Ao redor disso, será usado também um banco de dados **MySQL/MariaDB**, que proporciona uma forma prática e performática de guardar os dados e realizar as consultas de _hash_.
+
+## Getting Started
+
+O primeiro passo é colocar as credenciais de acesso ao banco e à aplicação. Para isso, crie um arquivo `.env` na raiz do projeto, seguindo a estrutura abaixo.
+
+```
+APP_PORT=<app-port>
+DB_PORT=<db-port>
+DB_ROOT_PASSWORD=<db-root-pass>
+DB_USER=<db-root-pass>
+DB_PASSWORD=<db-pass>
+DB_HOST=<db-host>
+GIN_MODE=<gin-mode-string>
+```
+
+Agora, basta então abrir o terminal e rodar o comando para rodar os contêineres do Docker.
+
+```bash
+$ docker compose up
+```
