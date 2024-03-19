@@ -1,31 +1,20 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"clincker/controllers"
 	"log"
-	"net/http"
-)
 
-type response struct {
-	Ok      bool   `json:"ok"`
-	Message string `json:"message"`
-}
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	router := gin.Default()
 
-	router.GET("/", hello)
+	router.GET("/", controllers.Hello)
 
 	requestError := router.Run(":8080")
 
 	if requestError != nil {
 		log.Fatal(requestError)
 	}
-}
-
-func hello(request *gin.Context) {
-	request.IndentedJSON(http.StatusOK, response{
-		Ok:      true,
-		Message: "Clincker!",
-	})
 }
