@@ -15,13 +15,17 @@ func Start() {
 }
 
 func boot() {
-	router = gin.Default()
+	router = gin.New()
 }
 
 func setup() {
 	router.GET("/", controllers.Hello().Hello)
 
-	router.GET("/users", controllers.User().List)
+	userRoutes := router.Group("/user")
+	{
+		userRoutes.GET("/", controllers.User().List)
+		userRoutes.GET("/:id", controllers.User().Show)
+	}
 }
 
 func listen() {
