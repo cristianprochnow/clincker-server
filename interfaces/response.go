@@ -1,4 +1,4 @@
-package models
+package interfaces
 
 type Response struct {
 	Ok      bool   `json:"ok"`

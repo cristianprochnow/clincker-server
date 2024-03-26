@@ -19,7 +19,9 @@ func boot() {
 }
 
 func setup() {
-	router.GET("/", controllers.Hello)
+	router.GET("/", controllers.Hello().Hello)
+
+	router.GET("/users", controllers.User().List)
 }
 
 func listen() {

@@ -1,14 +1,24 @@
 package controllers
 
 import (
-	"clincker/models"
+	"clincker/interfaces"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Hello(request *gin.Context) {
-	request.IndentedJSON(http.StatusOK, models.Response{
+type HelloController struct {
+	Hello func(request *gin.Context)
+}
+
+func Hello() HelloController {
+	return HelloController{
+		Hello: hello,
+	}
+}
+
+func hello(request *gin.Context) {
+	request.IndentedJSON(http.StatusOK, interfaces.Response{
 		Ok:      true,
 		Message: "Clincker!",
 	})
