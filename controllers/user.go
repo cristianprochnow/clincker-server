@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"clincker/interfaces"
+	"clincker/models"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -20,9 +21,24 @@ func User() UserController {
 }
 
 func list(request *gin.Context) {
-	request.IndentedJSON(http.StatusOK, interfaces.Response{
-		Ok:      true,
-		Message: "Rota de listagem dos usuários!",
+	users, exception := models.User().List()
+
+	type response struct {
+		Resource interfaces.Response `json:"resource"`
+		Data     []models.UserStruct `json:"users"`
+	}
+
+	message := exception.Error()
+	if message == "" {
+		message = "Listagem de usuários concluída."
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok:      exception == nil,
+			Message: message,
+		},
+		Data: users,
 	})
 }
 
