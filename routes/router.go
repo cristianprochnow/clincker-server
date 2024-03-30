@@ -29,5 +29,5 @@ func setup() {
 }
 
 func listen() {
-	utils.Error(router.Run(":8080"))
+	utils.Log().Exception(router.Run(":8080"))
 }
