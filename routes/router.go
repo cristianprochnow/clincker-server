@@ -2,8 +2,8 @@ package routes
 
 import (
 	"clincker/controllers"
+	"clincker/utils"
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
 var router *gin.Engine
@@ -29,9 +29,5 @@ func setup() {
 }
 
 func listen() {
-	requestError := router.Run(":8080")
-
-	if requestError != nil {
-		log.Fatal(requestError)
-	}
+	utils.Error(router.Run(":8080"))
 }
