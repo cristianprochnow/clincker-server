@@ -40,6 +40,7 @@ DB_ROOT_PASSWORD=<db-root-pass>
 DB_USER=<db-root-pass>
 DB_PASSWORD=<db-pass>
 DB_HOST=<db-host>
+DB_NAME=<db-name>
 GIN_MODE=<gin-mode-string>
 ```
 
