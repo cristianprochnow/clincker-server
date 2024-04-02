@@ -19,10 +19,11 @@ func Connect() *sql.DB {
 }
 
 func start() {
-	fmt.Printf(os.Getenv("DB_USER"))
 	connection := mysql.Config{
-		User:   os.Getenv("DB_USER"),
-		Passwd: os.Getenv("DB_PASSWORD"),
+		// User:   os.Getenv("DB_USER"),
+		// Passwd: os.Getenv("DB_PASSWORD"),
+		User:   os.Getenv("DB_ROOT_USER"),
+		Passwd: os.Getenv("DB_ROOT_PASSWORD"),
 		Net:    "tcp",
 		Addr: fmt.Sprintf(
 			"%s:%s",

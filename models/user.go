@@ -6,8 +6,9 @@ import (
 )
 
 type UserStruct struct {
-	Id    int    `json:"id"`
-	Email string `json:"email"`
+	Id      int    `json:"id"`
+	Email   string `json:"email"`
+	IsAdmin string `json:"is_admin"`
 }
 
 type UserModel struct {
@@ -36,11 +37,11 @@ func list() ([]UserStruct, error) {
 		var user UserStruct
 
 		exception := rows.Scan(
-			&user.Id, &user.Email,
+			&user.Id, &user.Email, &user.IsAdmin,
 		)
 
 		if exception != nil {
-			return nil, fmt.Errorf("models.users.list: %s", exception)
+			return nil, fmt.Errorf("models.users.list: %s", exception.Error())
 		}
 
 		users = append(users, user)
@@ -49,7 +50,7 @@ func list() ([]UserStruct, error) {
 	exception = rows.Err()
 
 	if exception != nil {
-		return nil, fmt.Errorf("models.users.list: %s", exception)
+		return nil, fmt.Errorf("models.users.list: %s", exception.Error())
 	}
 
 	return users, nil
