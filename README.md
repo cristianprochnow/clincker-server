@@ -34,14 +34,15 @@ Ao redor disso, será usado também um banco de dados **MySQL/MariaDB**, que pro
 O primeiro passo é colocar as credenciais de acesso ao banco e à aplicação. Para isso, crie um arquivo `.env` na raiz do projeto, seguindo a estrutura abaixo.
 
 ```
-APP_PORT=<app-port>
-DB_PORT=<db-port>
-DB_ROOT_PASSWORD=<db-root-pass>
-DB_USER=<db-root-pass>
-DB_PASSWORD=<db-pass>
-DB_HOST=<db-host>
-DB_NAME=<db-name>
-GIN_MODE=<gin-mode-string>
+APP_PORT=
+DB_PORT=
+DB_ROOT_USER=root
+DB_ROOT_PASSWORD=
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_NAME=
+GIN_MODE=debug
 ```
 
 Agora, basta então abrir o terminal e rodar o comando para rodar os contêineres do Docker.
