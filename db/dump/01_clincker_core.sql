@@ -1,0 +1,8 @@
+CREATE DATABASE `clincker_core` CHARACTER SET utf8 COLLATE utf8_bin;
+USE `clincker_core`;
+
+CREATE TABLE users (
+   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+   email VARCHAR(80) NULL DEFAULT NULL,
+   is_admin SET('1') NULL DEFAULT NULL
+) CHARACTER SET utf8 COLLATE utf8_bin;
