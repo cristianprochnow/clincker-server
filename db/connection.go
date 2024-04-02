@@ -19,7 +19,6 @@ func Connect() *sql.DB {
 }
 
 func start() {
-	fmt.Printf(os.Getenv("DB_USER"))
 	connection := mysql.Config{
 		// User:   os.Getenv("DB_USER"),
 		// Passwd: os.Getenv("DB_PASSWORD"),

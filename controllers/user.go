@@ -28,9 +28,10 @@ func list(request *gin.Context) {
 		Data     []models.UserStruct `json:"users"`
 	}
 
-	message := exception.Error()
-	if message == "" {
-		message = "Listagem de usuários concluída."
+	message := "Listagem de usuários concluída."
+
+	if exception != nil {
+		message = exception.Error()
 	}
 
 	request.IndentedJSON(http.StatusOK, response{
