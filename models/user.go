@@ -16,11 +16,13 @@ type UserStruct struct {
 
 type UserModel struct {
 	List func() ([]UserStruct, error)
+	Show func(id int) (*UserStruct, error)
 }
 
 func User() UserModel {
 	return UserModel{
 		List: list,
+		Show: show,
 	}
 }
 
@@ -35,6 +37,12 @@ func list() ([]UserStruct, error) {
 	}
 
 	defer rows.Close()
+
+	exception = rows.Err()
+
+	if exception != nil {
+		return nil, fmt.Errorf("models.users.list: %s", exception.Error())
+	}
 
 	for rows.Next() {
 		var user UserStruct
@@ -55,11 +63,27 @@ func list() ([]UserStruct, error) {
 		users = append(users, user)
 	}
 
-	exception = rows.Err()
+	return users, nil
+}
+
+func show(id int) (*UserStruct, error) {
+	var user UserStruct
+
+	sql := db.Connect()
+	exception := sql.QueryRow(
+		"SELECT * FROM users WHERE users.id = ?", id,
+	).Scan(
+		&user.Id,
+		&user.Email,
+		&user.Name,
+		&user.IsAdmin,
+		&user.Password,
+		&user.CreatedAt,
+	)
 
 	if exception != nil {
-		return nil, fmt.Errorf("models.users.list: %s", exception.Error())
+		return nil, fmt.Errorf("models.users.show: %s", exception)
 	}
 
-	return users, nil
+	return &user, nil
 }
