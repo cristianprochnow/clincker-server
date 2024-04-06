@@ -6,9 +6,12 @@ import (
 )
 
 type UserStruct struct {
-	Id      int    `json:"id"`
-	Email   string `json:"email"`
-	IsAdmin string `json:"is_admin"`
+	Id        int    `json:"id"`
+	Email     string `json:"email"`
+	Name      string `json:"name"`
+	IsAdmin   string `json:"is_admin"`
+	Password  string `json:"password"`
+	CreatedAt string `json:"created_at"`
 }
 
 type UserModel struct {
@@ -37,7 +40,12 @@ func list() ([]UserStruct, error) {
 		var user UserStruct
 
 		exception := rows.Scan(
-			&user.Id, &user.Email, &user.IsAdmin,
+			&user.Id,
+			&user.Email,
+			&user.Name,
+			&user.IsAdmin,
+			&user.Password,
+			&user.CreatedAt,
 		)
 
 		if exception != nil {
