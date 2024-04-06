@@ -64,8 +64,6 @@ func show(request *gin.Context) {
 
 	user, exception := models.User().Show(value)
 
-	fmt.Println(user)
-
 	if exception != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
