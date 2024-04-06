@@ -2,8 +2,15 @@ package models
 
 import (
 	"clincker/db"
+	"context"
 	"fmt"
 )
+
+type UserInsertStruct struct {
+	Email    string
+	Name     string
+	Password string
+}
 
 type UserStruct struct {
 	Id        int    `json:"id"`
@@ -82,8 +89,29 @@ func show(id int) (*UserStruct, error) {
 	)
 
 	if exception != nil {
-		return nil, fmt.Errorf("models.users.show: %s", exception)
+		return nil, fmt.Errorf("models.users.show: %s", exception.Error())
 	}
 
 	return &user, nil
+}
+
+func create(user UserInsertStruct) (int, error) {
+	sql := db.Connect()
+
+	insertResult, exception := sql.ExecContext(
+		context.Background(),
+		"INSERT INTO users(email, name, password) VALUES (?, ?, ?)",
+		user.Email, user.Name, user.Password)
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.users.create: %s", exception.Error())
+	}
+
+	id, exception := insertResult.LastInsertId()
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.users.create: %s", exception.Error())
+	}
+
+	return int(id), nil
 }

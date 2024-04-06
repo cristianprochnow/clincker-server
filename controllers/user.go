@@ -88,3 +88,7 @@ func show(request *gin.Context) {
 		Data: user,
 	})
 }
+
+func create(request *gin.Context) {
+
+}
