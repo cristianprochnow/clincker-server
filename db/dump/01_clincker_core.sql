@@ -4,6 +4,7 @@ USE `clincker_core`;
 CREATE TABLE users (
    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
    email VARCHAR(80) NOT NULL,
+   name VARCHAR(100) NULL,
    is_admin SET('0', '1') NULL DEFAULT '0',
    password VARCHAR(80) NOT NULL,
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NULL
@@ -12,7 +13,7 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX users_email_uindex
     ON users (email);
 
-INSERT INTO users (email, is_admin, password)
+INSERT INTO users (email, name, is_admin, password)
 VALUES
-    ("contact@contact.com.br", "1", "swiheiwheweuwheuwhe"),
-    ("extra@extra.com.br", "0", "hsuhuhuhsuhdushds");
+    ("contact@contact.com.br", "Contato par Contato", "1", "swiheiwheweuwheuwhe"),
+    ("extra@extra.com.br", "Extra Extra", "0", "hsuhuhuhsuhdushds");
