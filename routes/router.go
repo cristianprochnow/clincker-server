@@ -25,6 +25,7 @@ func setup() {
 	{
 		userRoutes.GET("/", controllers.User().List)
 		userRoutes.GET("/:id", controllers.User().Show)
+		userRoutes.POST("/", controllers.User().Create)
 	}
 }
 

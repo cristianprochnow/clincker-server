@@ -3,6 +3,7 @@ package controllers
 import (
 	"clincker/interfaces"
 	"clincker/models"
+	"clincker/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -10,14 +11,16 @@ import (
 )
 
 type UserController struct {
-	List func(request *gin.Context)
-	Show func(request *gin.Context)
+	List   func(request *gin.Context)
+	Show   func(request *gin.Context)
+	Create func(request *gin.Context)
 }
 
 func User() UserController {
 	return UserController{
-		List: list,
-		Show: show,
+		List:   list,
+		Show:   show,
+		Create: create,
 	}
 }
 
@@ -50,6 +53,11 @@ func list(request *gin.Context) {
 }
 
 func show(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response `json:"resource"`
+		Data     *models.UserStruct  `json:"users"`
+	}
+
 	id := request.Param("id")
 	value, conversionError := strconv.Atoi(id)
 
@@ -65,6 +73,18 @@ func show(request *gin.Context) {
 	user, exception := models.User().Show(value)
 
 	if exception != nil {
+		if utils.IsNoRowsError(exception.Error()) {
+			request.IndentedJSON(http.StatusOK, response{
+				Resource: interfaces.Response{
+					Ok:      true,
+					Message: fmt.Sprintf("Rota de Info de Usuário com código %s!", id),
+				},
+				Data: nil,
+			})
+
+			return
+		}
+
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
@@ -73,11 +93,6 @@ func show(request *gin.Context) {
 		})
 
 		return
-	}
-
-	type response struct {
-		Resource interfaces.Response `json:"resource"`
-		Data     *models.UserStruct  `json:"users"`
 	}
 
 	request.IndentedJSON(http.StatusOK, response{
