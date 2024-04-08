@@ -26,22 +26,34 @@ type UserStruct struct {
 }
 
 type UserModel struct {
-	List    func() ([]UserStruct, error)
-	Show    func(id int) (*UserStruct, error)
-	Verify  func(email string) (*UserStruct, error)
-	Create  func(user UserInsertStruct) (int, error)
-	Update  func(user UserInsertStruct, id int) (int, error)
-	IsValid func(dataSent UserInsertStruct) bool
+	List         func() ([]UserStruct, error)
+	Show         func(id int) (*UserStruct, error)
+	Verify       func(email string) (*UserStruct, error)
+	Create       func(user UserInsertStruct) (int, error)
+	Update       func(user UserInsertStruct, id int) (int, error)
+	IsValid      func(dataSent UserInsertStruct) bool
+	IsValidLogin func(dataSent UserLogin) bool
+}
+
+type UserLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UserLoginToken struct {
+	Id    int    `json:"id"`
+	Token string `json:"token"`
 }
 
 func User() UserModel {
 	return UserModel{
-		List:    list,
-		Show:    show,
-		Create:  create,
-		Update:  update,
-		Verify:  verify,
-		IsValid: isValidUser,
+		List:         list,
+		Show:         show,
+		Create:       create,
+		Update:       update,
+		Verify:       verify,
+		IsValid:      isValidUser,
+		IsValidLogin: isValidLogin,
 	}
 }
 
@@ -182,4 +194,8 @@ func isValidUser(dataSent UserInsertStruct) bool {
 	return dataSent.Email != "" &&
 		dataSent.Name != "" &&
 		dataSent.Password != ""
+}
+
+func isValidLogin(dataSent UserLogin) bool {
+	return dataSent.Email != "" && dataSent.Password != ""
 }

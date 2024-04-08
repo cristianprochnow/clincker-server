@@ -11,6 +11,7 @@ import (
 )
 
 type UserController struct {
+	Login  func(request *gin.Context)
 	List   func(request *gin.Context)
 	Show   func(request *gin.Context)
 	Create func(request *gin.Context)
@@ -19,11 +20,94 @@ type UserController struct {
 
 func User() UserController {
 	return UserController{
+		Login:  login,
 		List:   list,
 		Show:   show,
 		Create: create,
 		Update: update,
 	}
+}
+
+func login(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response   `json:"resource"`
+		Data     models.UserLoginToken `json:"login"`
+	}
+
+	var user models.UserLogin
+
+	requestError := request.BindJSON(&user)
+
+	if requestError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Formato inválido de JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	if !models.User().IsValidLogin(user) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Campos obrigatórios faltando no JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	userExists, _ := models.User().Verify(user.Email)
+
+	if userExists == nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Usuário não encontrado no banco de dados.",
+			),
+		})
+
+		return
+	}
+
+	matches := utils.Crypto().Equals(userExists.Password, user.Password)
+
+	if !matches {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: fmt.Sprintf("Usuário ou senha inválidos"),
+		})
+
+		return
+	}
+
+	token, tokenError := utils.Crypto().Hash(
+		userExists.Email + userExists.Name)
+
+	if tokenError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro ao gerar o token de validação [%s]",
+				tokenError.Error()),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok:      true,
+			Message: "Rota de login do usuário!",
+		},
+		Data: models.UserLoginToken{
+			Id:    userExists.Id,
+			Token: token,
+		},
+	})
 }
 
 func list(request *gin.Context) {
@@ -57,7 +141,7 @@ func list(request *gin.Context) {
 func show(request *gin.Context) {
 	type response struct {
 		Resource interfaces.Response `json:"resource"`
-		Data     *models.UserStruct  `json:"users"`
+		Data     *models.UserStruct  `json:"user"`
 	}
 
 	id := request.Param("id")
@@ -108,8 +192,8 @@ func show(request *gin.Context) {
 
 func create(request *gin.Context) {
 	type response struct {
-		Resource interfaces.Response `json:"resource"`
-		Data     models.NewUserResponseStruct
+		Resource interfaces.Response          `json:"resource"`
+		Data     models.NewUserResponseStruct `json:"user"`
 	}
 
 	var newUser models.UserInsertStruct
@@ -198,8 +282,8 @@ func create(request *gin.Context) {
 
 func update(request *gin.Context) {
 	type response struct {
-		Resource interfaces.Response `json:"resource"`
-		Data     models.NewUserResponseStruct
+		Resource interfaces.Response          `json:"resource"`
+		Data     models.NewUserResponseStruct `json:"user"`
 	}
 
 	id := request.Param("id")
