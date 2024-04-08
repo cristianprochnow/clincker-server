@@ -1,0 +1,340 @@
+{
+	"info": {
+		"_postman_id": "94afcdba-91f5-4a86-9e30-e6d46faafc23",
+		"name": "Clincker Server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34122525"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Listar",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/user",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 08 Apr 2024 00:03:08 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "618"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"resource\": {\n        \"ok\": true,\n        \"message\": \"Rota de listagem de Usuários!\"\n    },\n    \"users\": [\n        {\n            \"id\": 1,\n            \"email\": \"contact@contact.com.br\",\n            \"name\": \"Contato par Contato\",\n            \"is_admin\": \"1\",\n            \"password\": \"swiheiwheweuwheuwhe\",\n            \"created_at\": \"2024-04-05 23:53:21\"\n        },\n        {\n            \"id\": 2,\n            \"email\": \"extra@extra.com.br\",\n            \"name\": \"Extra Extra\",\n            \"is_admin\": \"0\",\n            \"password\": \"hsuhuhuhsuhdushds\",\n            \"created_at\": \"2024-04-05 23:53:21\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Show",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/user/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"2"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Listar Copy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/user/2",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"user",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 08 Apr 2024 00:03:24 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "327"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"resource\": {\n        \"ok\": true,\n        \"message\": \"Rota de Info de Usuário com código 2!\"\n    },\n    \"users\": {\n        \"id\": 2,\n        \"email\": \"extra@extra.com.br\",\n        \"name\": \"Extra Extra\",\n        \"is_admin\": \"0\",\n        \"password\": \"hsuhuhuhsuhdushds\",\n        \"created_at\": \"2024-04-05 23:53:21\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Cristian Top\",\r\n    \"email\": \"contato@cristian.top.com.br\",\r\n    \"password\": \"ShowDeBola\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Show Copy",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Cristian Top\",\r\n    \"email\": \"contato@cristian.top.com.br\",\r\n    \"password\": \"ShowDeBola\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/user",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 08 Apr 2024 02:23:04 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "151"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"resource\": {\n        \"ok\": true,\n        \"message\": \"Rota de Inserção de Usuário com código 7!\"\n    },\n    \"Data\": {\n        \"id\": 7\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Cristian Top\",\r\n    \"email\": \"contato@cristian.topzera.com.br\",\r\n    \"password\": \"ShowDeBola\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/6",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"6"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Copy",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Cristian Top\",\r\n    \"email\": \"contato@cristian.topzera.com.br\",\r\n    \"password\": \"AindaMelhorQueAntes\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/user/6",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"user",
+										"6"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 08 Apr 2024 02:41:04 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "154"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"resource\": {\n        \"ok\": true,\n        \"message\": \"Rota de Atualização de Usuário com código 6!\"\n    },\n    \"Data\": {\n        \"id\": 6\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"contato@cristian.topzera.com.br\",\r\n    \"password\": \"AindaMelhorQueAntes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update Copy",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"contato@cristian.topzera.com.br\",\r\n    \"password\": \"AindaMelhorQueAntes\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/user/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"user",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 08 Apr 2024 02:45:02 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "214"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"resource\": {\n        \"ok\": true,\n        \"message\": \"Rota de login do usuário!\"\n    },\n    \"login\": {\n        \"id\": 6,\n        \"token\": \"$2a$16$t4zHOhs7tT6et9SFVH3jXO2E90E9gMsvyYLUVJnp.kFM2JB5diw.2\"\n    }\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}
