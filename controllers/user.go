@@ -156,6 +156,21 @@ func create(request *gin.Context) {
 		return
 	}
 
+	hashedPassword, exception := utils.Crypto().Hash(newUser.Password)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na inserção de usuário! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	newUser.Password = hashedPassword
+
 	id, exception := models.User().Create(newUser)
 
 	if exception != nil {
@@ -258,6 +273,21 @@ func update(request *gin.Context) {
 
 		return
 	}
+
+	hashedPassword, exception := utils.Crypto().Hash(userExists.Password)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na inserção de usuário! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	userExists.Password = hashedPassword
 
 	_, exception = models.User().Update(userExists, value)
 
