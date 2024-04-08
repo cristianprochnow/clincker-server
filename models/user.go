@@ -30,6 +30,7 @@ type UserModel struct {
 	Show    func(id int) (*UserStruct, error)
 	Verify  func(email string) (*UserStruct, error)
 	Create  func(user UserInsertStruct) (int, error)
+	Update  func(user UserInsertStruct, id int) (int, error)
 	IsValid func(dataSent UserInsertStruct) bool
 }
 
@@ -38,6 +39,7 @@ func User() UserModel {
 		List:    list,
 		Show:    show,
 		Create:  create,
+		Update:  update,
 		Verify:  verify,
 		IsValid: isValidUser,
 	}
@@ -153,6 +155,27 @@ func create(user UserInsertStruct) (int, error) {
 	}
 
 	return int(id), nil
+}
+
+func update(user UserInsertStruct, id int) (int, error) {
+	sql := db.Connect()
+
+	insertResult, exception := sql.ExecContext(
+		context.Background(),
+		"UPDATE users SET email = ?, name = ?, password = ? WHERE id = ?",
+		user.Email, user.Name, user.Password, id)
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.users.update: %s", exception.Error())
+	}
+
+	idExists, exception := insertResult.LastInsertId()
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.users.update: %s", exception.Error())
+	}
+
+	return int(idExists), nil
 }
 
 func isValidUser(dataSent UserInsertStruct) bool {

@@ -14,6 +14,7 @@ type UserController struct {
 	List   func(request *gin.Context)
 	Show   func(request *gin.Context)
 	Create func(request *gin.Context)
+	Update func(request *gin.Context)
 }
 
 func User() UserController {
@@ -21,6 +22,7 @@ func User() UserController {
 		List:   list,
 		Show:   show,
 		Create: create,
+		Update: update,
 	}
 }
 
@@ -175,6 +177,109 @@ func create(request *gin.Context) {
 		},
 		Data: models.NewUserResponseStruct{
 			Id: id,
+		},
+	})
+}
+
+func update(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response `json:"resource"`
+		Data     models.NewUserResponseStruct
+	}
+
+	id := request.Param("id")
+	value, conversionError := strconv.Atoi(id)
+
+	if conversionError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: fmt.Sprintf("Valor de ID %s inválido!", id),
+		})
+
+		return
+	}
+
+	verificationUser, exception := models.User().Show(value)
+
+	if verificationUser == nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Usuário %d não encontrado na base de dados", value,
+			),
+		})
+
+		return
+	}
+
+	var userExists models.UserInsertStruct
+
+	requestError := request.BindJSON(&userExists)
+
+	if requestError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Formato inválido de JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	if !models.User().IsValid(userExists) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Campos obrigatórios faltando no JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	otherUser, _ := models.User().Verify(userExists.Email)
+
+	if otherUser != nil &&
+		otherUser.Email == userExists.Email &&
+		otherUser.Id != value {
+		request.IndentedJSON(http.StatusOK, response{
+			Resource: interfaces.Response{
+				Ok: false,
+				Message: fmt.Sprintf(
+					"Erro na inserção de usuário! "+
+						"[Usuário com e-mail %s já existe com id %d!]",
+					userExists.Email, otherUser.Id),
+			},
+			Data: models.NewUserResponseStruct{
+				Id: verificationUser.Id,
+			},
+		})
+
+		return
+	}
+
+	_, exception = models.User().Update(userExists, value)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na Atualização de usuário! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok: true,
+			Message: fmt.Sprintf(
+				"Rota de Atualização de Usuário com código %d!", value),
+		},
+		Data: models.NewUserResponseStruct{
+			Id: value,
 		},
 	})
 }
