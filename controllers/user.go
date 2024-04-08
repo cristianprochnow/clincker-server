@@ -105,5 +105,76 @@ func show(request *gin.Context) {
 }
 
 func create(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response `json:"resource"`
+		Data     models.NewUserResponseStruct
+	}
 
+	var newUser models.UserInsertStruct
+
+	requestError := request.BindJSON(&newUser)
+
+	if requestError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Formato inválido de JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	if !models.User().IsValid(newUser) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Campos obrigatórios faltando no JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	userExists, exception := models.User().Verify(newUser.Email)
+
+	if userExists != nil {
+		request.IndentedJSON(http.StatusOK, response{
+			Resource: interfaces.Response{
+				Ok: false,
+				Message: fmt.Sprintf(
+					"Erro na inserção de usuário! [%s]",
+					exception.Error()),
+			},
+			Data: models.NewUserResponseStruct{
+				Id: userExists.Id,
+			},
+		})
+
+		return
+	}
+
+	id, exception := models.User().Create(newUser)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na inserção de usuário! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok: true,
+			Message: fmt.Sprintf(
+				"Rota de Inserção de Usuário com código %d!", id),
+		},
+		Data: models.NewUserResponseStruct{
+			Id: id,
+		},
+	})
 }

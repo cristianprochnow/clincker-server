@@ -7,9 +7,13 @@ import (
 )
 
 type UserInsertStruct struct {
-	Email    string
-	Name     string
-	Password string
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+type NewUserResponseStruct struct {
+	Id int `json:"id"`
 }
 
 type UserStruct struct {
@@ -22,14 +26,20 @@ type UserStruct struct {
 }
 
 type UserModel struct {
-	List func() ([]UserStruct, error)
-	Show func(id int) (*UserStruct, error)
+	List    func() ([]UserStruct, error)
+	Show    func(id int) (*UserStruct, error)
+	Verify  func(email string) (*UserStruct, error)
+	Create  func(user UserInsertStruct) (int, error)
+	IsValid func(dataSent UserInsertStruct) bool
 }
 
 func User() UserModel {
 	return UserModel{
-		List: list,
-		Show: show,
+		List:    list,
+		Show:    show,
+		Create:  create,
+		Verify:  verify,
+		IsValid: isValidUser,
 	}
 }
 
@@ -95,6 +105,35 @@ func show(id int) (*UserStruct, error) {
 	return &user, nil
 }
 
+func verify(email string) (*UserStruct, error) {
+	var user UserStruct
+
+	sql := db.Connect()
+	exception := sql.QueryRow(
+		"SELECT * FROM users WHERE users.email = ?", email,
+	).Scan(
+		&user.Id,
+		&user.Email,
+		&user.Name,
+		&user.IsAdmin,
+		&user.Password,
+		&user.CreatedAt,
+	)
+
+	if exception != nil {
+		return nil, fmt.Errorf("models.users.show: %s", exception.Error())
+	}
+
+	if user.Id != 0 {
+		return &user, fmt.Errorf(
+			"models.users.verify: Conta com e-mail %s já existente",
+			email,
+		)
+	}
+
+	return nil, nil
+}
+
 func create(user UserInsertStruct) (int, error) {
 	sql := db.Connect()
 
@@ -114,4 +153,10 @@ func create(user UserInsertStruct) (int, error) {
 	}
 
 	return int(id), nil
+}
+
+func isValidUser(dataSent UserInsertStruct) bool {
+	return dataSent.Email != "" &&
+		dataSent.Name != "" &&
+		dataSent.Password != ""
 }
