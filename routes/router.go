@@ -33,7 +33,8 @@ func setup() {
 	linkRoutes := router.Group("/link")
 	{
 		linkRoutes.GET(
-			"/user/:user_id", controllers.Link().ListByUser)
+			"/user/:user_id",
+			controllers.Link().ListByUser)
 	}
 }
 
