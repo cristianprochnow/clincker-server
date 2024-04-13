@@ -29,6 +29,12 @@ func setup() {
 		userRoutes.PUT("/:id", controllers.User().Update)
 		userRoutes.POST("/login", controllers.User().Login)
 	}
+
+	linkRoutes := router.Group("/link")
+	{
+		linkRoutes.GET(
+			"/user/:user_id", controllers.Link().ListByUser)
+	}
 }
 
 func listen() {
