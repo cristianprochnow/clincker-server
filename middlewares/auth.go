@@ -1,8 +1,10 @@
 package middlewares
 
 import (
-	"fmt"
+	"clincker/interfaces"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 )
 
 type AuthMiddleware struct {
@@ -17,9 +19,30 @@ func Auth() AuthMiddleware {
 
 func verifyAuth(request *gin.Context) {
 	userId := request.GetHeader("CLINCKER-USER")
+	userIdFormat, _ := strconv.Atoi(userId)
 	userToken := request.GetHeader("CLINCKER-TOKEN")
 
-	fmt.Print(userId, userToken)
+	if userIdFormat == 0 {
+		request.IndentedJSON(http.StatusForbidden, interfaces.Response{
+			Ok: false,
+			Message: "Código de usuário é obrigatório para autenticação " +
+				"por meio do Header CLINCKER-USER.",
+		})
+		request.Abort()
+
+		return
+	}
+
+	if userToken == "" {
+		request.IndentedJSON(http.StatusForbidden, interfaces.Response{
+			Ok: false,
+			Message: "Token do usuário é obrigatório para autenticação " +
+				"por meio do Header CLINCKER-TOKEN.",
+		})
+		request.Abort()
+
+		return
+	}
 
 	request.Next()
 }

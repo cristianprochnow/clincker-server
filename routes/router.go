@@ -2,6 +2,7 @@ package routes
 
 import (
 	"clincker/controllers"
+	"clincker/middlewares"
 	"clincker/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -34,6 +35,7 @@ func setup() {
 	{
 		linkRoutes.GET(
 			"/user/:user_id",
+			middlewares.Auth().Verify,
 			controllers.Link().ListByUser)
 	}
 }
