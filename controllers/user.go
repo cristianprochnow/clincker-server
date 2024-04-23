@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -85,7 +86,7 @@ func login(request *gin.Context) {
 	}
 
 	token, tokenError := utils.Crypto().Hash(
-		userExists.Email + userExists.Name)
+		userExists.Email + userExists.Name + os.Getenv("TOKEN_SECRET"))
 
 	if tokenError != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
