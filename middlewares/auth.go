@@ -2,9 +2,13 @@ package middlewares
 
 import (
 	"clincker/interfaces"
-	"github.com/gin-gonic/gin"
+	"clincker/models"
+	"clincker/utils"
+	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type AuthMiddleware struct {
@@ -38,6 +42,47 @@ func verifyAuth(request *gin.Context) {
 			Ok: false,
 			Message: "Token do usuário é obrigatório para autenticação " +
 				"por meio do Header CLINCKER-TOKEN.",
+		})
+		request.Abort()
+
+		return
+	}
+
+	user, userError := models.User().Show(userIdFormat)
+
+	if (userError != nil) {
+		request.IndentedJSON(http.StatusBadRequest, interfaces.Response{
+			Ok: false,
+			Message: userError.Error(),
+		})
+		request.Abort()
+
+		return
+	}
+
+	if (user == nil) {
+		request.IndentedJSON(http.StatusForbidden, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Usuário %d não encontrado.", userIdFormat
+			),
+		})
+		request.Abort()
+
+		return
+	}
+
+	isValidCredentials := utils.Crypto().Equals(
+		userToken,
+		utils.Crypto().Hash(utils.User().GetLoginToken(
+			user.Email, user.Name,
+		)),
+	)
+
+	if (!isValidCredentials) {
+		request.IndentedJSON(http.StatusForbidden, interfaces.Response{
+			Ok: false,
+			Message: "Token CLINCKER-TOKEN é inválido.",
 		})
 		request.Abort()
 

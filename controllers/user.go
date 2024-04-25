@@ -5,10 +5,10 @@ import (
 	"clincker/models"
 	"clincker/utils"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"os"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
@@ -86,7 +86,10 @@ func login(request *gin.Context) {
 	}
 
 	token, tokenError := utils.Crypto().Hash(
-		userExists.Email + userExists.Name + os.Getenv("TOKEN_SECRET"))
+		utils.User().GetLoginToken(
+			userExists.Email, userExists.Name,
+		),
+	)
 
 	if tokenError != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
