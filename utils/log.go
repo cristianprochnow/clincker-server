@@ -6,16 +6,18 @@ import (
 )
 
 type LogUtil struct {
-	Exception func(exception error)
+	Exception     func(exception error)
+	IsNoRowsError func(errorText string) bool
 }
 
 func Log() LogUtil {
 	return LogUtil{
-		Exception: exception,
+		Exception:     exception,
+		IsNoRowsError: isNoRowsError,
 	}
 }
 
-func IsNoRowsError(errorText string) bool {
+func isNoRowsError(errorText string) bool {
 	return strings.Contains(errorText, "no rows in result set")
 }
 

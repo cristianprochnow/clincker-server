@@ -163,7 +163,7 @@ func show(request *gin.Context) {
 	user, exception := models.User().Show(value)
 
 	if exception != nil {
-		if utils.IsNoRowsError(exception.Error()) {
+		if utils.Log().IsNoRowsError(exception.Error()) {
 			request.IndentedJSON(http.StatusOK, response{
 				Resource: interfaces.Response{
 					Ok:      true,

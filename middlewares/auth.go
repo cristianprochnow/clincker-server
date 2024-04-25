@@ -50,6 +50,18 @@ func verifyAuth(request *gin.Context) {
 
 	user, userError := models.User().Show(userIdFormat)
 
+	if userError != nil && utils.Log().IsNoRowsError(userError.Error()) {
+		request.IndentedJSON(http.StatusBadRequest, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Usuário %d enviado no CLINCKER-USER não encontrado.",
+				userIdFormat),
+		})
+		request.Abort()
+
+		return
+	}
+
 	if userError != nil {
 		request.IndentedJSON(http.StatusBadRequest, interfaces.Response{
 			Ok:      false,
