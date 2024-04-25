@@ -50,9 +50,9 @@ func verifyAuth(request *gin.Context) {
 
 	user, userError := models.User().Show(userIdFormat)
 
-	if (userError != nil) {
+	if userError != nil {
 		request.IndentedJSON(http.StatusBadRequest, interfaces.Response{
-			Ok: false,
+			Ok:      false,
 			Message: userError.Error(),
 		})
 		request.Abort()
@@ -60,11 +60,12 @@ func verifyAuth(request *gin.Context) {
 		return
 	}
 
-	if (user == nil) {
+	if user == nil {
 		request.IndentedJSON(http.StatusForbidden, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
-				"Usuário %d não encontrado.", userIdFormat
+				"Usuário %d enviado em CLINCKER-USER não foi encontrado.",
+				userIdFormat,
 			),
 		})
 		request.Abort()
@@ -72,16 +73,17 @@ func verifyAuth(request *gin.Context) {
 		return
 	}
 
+	hash, _ := utils.Crypto().Hash(utils.User().GetLoginToken(
+		user.Email, user.Name,
+	))
 	isValidCredentials := utils.Crypto().Equals(
 		userToken,
-		utils.Crypto().Hash(utils.User().GetLoginToken(
-			user.Email, user.Name,
-		)),
+		hash,
 	)
 
-	if (!isValidCredentials) {
+	if !isValidCredentials {
 		request.IndentedJSON(http.StatusForbidden, interfaces.Response{
-			Ok: false,
+			Ok:      false,
 			Message: "Token CLINCKER-TOKEN é inválido.",
 		})
 		request.Abort()
