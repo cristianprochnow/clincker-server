@@ -68,16 +68,6 @@ func verifyAuth(request *gin.Context) {
 		return
 	}
 
-	if userError != nil {
-		request.IndentedJSON(http.StatusBadRequest, interfaces.Response{
-			Ok:      false,
-			Message: userError.Error(),
-		})
-		request.Abort()
-
-		return
-	}
-
 	if user == nil {
 		request.IndentedJSON(http.StatusForbidden, interfaces.Response{
 			Ok: false,
@@ -91,12 +81,11 @@ func verifyAuth(request *gin.Context) {
 		return
 	}
 
-	hash, _ := utils.Crypto().Hash(utils.User().GetLoginToken(
-		user.Email, user.Name,
-	))
 	isValidCredentials := utils.Crypto().Equals(
 		userToken,
-		hash,
+		utils.User().GetLoginToken(
+			user.Email, user.Name,
+		),
 	)
 
 	if !isValidCredentials {
