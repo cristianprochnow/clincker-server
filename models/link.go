@@ -2,8 +2,18 @@ package models
 
 import (
 	"clincker/db"
+	"context"
 	"fmt"
 )
+
+type LinkInsertStruct struct {
+	Hash        string `json:"hash"`
+	OriginalUrl string `json:"original_url"`
+	Domain      string `json:"domain"`
+	Resources   string `json:"resources"`
+	Protocol    string `json:"protocol"`
+	User        int    `json:"user"`
+}
 
 type LinkStruct struct {
 	Id          int    `json:"id"`
@@ -71,4 +81,54 @@ func linkByUser(userId int) ([]LinkStruct, error) {
 	}
 
 	return links, nil
+}
+
+func addLinkUser(link LinkInsertStruct) (int, error) {
+	sql := db.Connect()
+
+	insertResult, exception := sql.ExecContext(
+		context.Background(),
+		"INSERT INTO users("+
+			"hash, original_url, domain, resources, protocol, user"+
+			") VALUES (?, ?, ?, ?, ?, ?)",
+		link.Hash, link.OriginalUrl, link.Domain,
+		link.Resources, link.Protocol, link.User)
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.links.create: %s", exception.Error())
+	}
+
+	id, exception := insertResult.LastInsertId()
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.links.create: %s", exception.Error())
+	}
+
+	return int(id), nil
+}
+
+func updateLinkUser(link LinkInsertStruct, id int) (int, error) {
+	sql := db.Connect()
+
+	insertResult, exception := sql.ExecContext(
+		context.Background(),
+		"UPDATE links "+
+			"SET hash = ?, original_url = ?, domain = ?, "+
+			"resources = ?, protocol = ?, user = ?, edited_at = NOW()"+
+			"WHERE id = ?",
+		link.Hash, link.OriginalUrl, link.Domain,
+		link.Resources, link.Protocol, link.User,
+		id)
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.users.update: %s", exception.Error())
+	}
+
+	idExists, exception := insertResult.LastInsertId()
+
+	if exception != nil {
+		return 0, fmt.Errorf("models.users.update: %s", exception.Error())
+	}
+
+	return int(idExists), nil
 }

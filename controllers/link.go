@@ -43,6 +43,8 @@ func listByUserLink(request *gin.Context) {
 		return
 	}
 
+	fmt.Println(user)
+
 	request.IndentedJSON(http.StatusOK, interfaces.Response{
 		Ok: true,
 		Message: fmt.Sprintf(
