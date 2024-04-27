@@ -24,6 +24,8 @@ type LinkStruct struct {
 	Domain      string `json:"domain"`
 	Resources   string `json:"resources"`
 	Protocol    string `json:"protocol"`
+	UserId      int    `json:"user_id"`
+	UserName    string `json:"user_name"`
 }
 
 type LinkModel struct {
@@ -41,10 +43,12 @@ func linkByUser(userId int) ([]LinkStruct, error) {
 
 	sql := db.Connect()
 	rows, exception := sql.Query(
-		"SELECT links.id, links.hash, links.created_at,"+
-			"links.edited_at, links.original_url, links.domain,"+
-			"links.resources, links.protocol"+
+		"SELECT links.id, links.hash, lin.created_at, "+
+			"links.edited_at, links.original_url, links.domain, "+
+			"links.resources, links.protocol, links.user user_id, "+
+			"users.name user_name "+
 			"FROM links "+
+			"LEFT JOIN users ON users.id = links.user "+
 			"WHERE links.user = ?", userId)
 
 	if exception != nil {
@@ -71,6 +75,8 @@ func linkByUser(userId int) ([]LinkStruct, error) {
 			&link.Domain,
 			&link.Resources,
 			&link.Protocol,
+			&link.UserId,
+			&link.UserName,
 		)
 
 		if exception != nil {
@@ -83,7 +89,7 @@ func linkByUser(userId int) ([]LinkStruct, error) {
 	return links, nil
 }
 
-func addLinkUser(link LinkInsertStruct) (int, error) {
+func addLink(link LinkInsertStruct) (int, error) {
 	sql := db.Connect()
 
 	insertResult, exception := sql.ExecContext(
@@ -107,7 +113,7 @@ func addLinkUser(link LinkInsertStruct) (int, error) {
 	return int(id), nil
 }
 
-func updateLinkUser(link LinkInsertStruct, id int) (int, error) {
+func updateLink(link LinkInsertStruct, id int) (int, error) {
 	sql := db.Connect()
 
 	insertResult, exception := sql.ExecContext(
@@ -131,4 +137,56 @@ func updateLinkUser(link LinkInsertStruct, id int) (int, error) {
 	}
 
 	return int(idExists), nil
+}
+
+func showLink(id int) (*LinkStruct, error) {
+	var link LinkStruct
+
+	sql := db.Connect()
+	exception := sql.QueryRow(
+		"SELECT links.id, links.hash, lin.created_at, "+
+			"links.edited_at, links.original_url, links.domain, "+
+			"links.resources, links.protocol, links.user user_id, "+
+			"users.name user_name "+
+			"FROM links "+
+			"LEFT JOIN users ON users.id = links.user "+
+			"WHERE links.id = ?", id,
+	).Scan(
+		&link.Id,
+		&link.Hash,
+		&link.CreatedAt,
+		&link.EditedAt,
+		&link.OriginalUrl,
+		&link.Domain,
+		&link.Resources,
+		&link.Protocol,
+		&link.UserId,
+		&link.UserName,
+	)
+
+	if exception != nil {
+		return nil, fmt.Errorf("models.links.show: %s", exception.Error())
+	}
+
+	return &link, nil
+}
+
+func deleteLink(id int) (bool, error) {
+	success := false
+	sql := db.Connect()
+	deleteResult, exception := sql.ExecContext(
+		context.Background(),
+		"DELETE FROM links WHERE id = %d", id)
+
+	if exception != nil {
+		return success, fmt.Errorf("models.users.delete: %s", exception.Error())
+	}
+
+	rowsAffected, _ := deleteResult.RowsAffected()
+
+	if rowsAffected > 0 {
+		success = true
+	}
+
+	return success, nil
 }
