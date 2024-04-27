@@ -50,10 +50,22 @@ func setup() {
 			"/user/:user_id",
 			middlewares.Auth().Verify,
 			controllers.Link().ListByUser)
-		linkRoutes.GET(
-			"/user/:user_id",
+		linkRoutes.POST(
+			"/",
 			middlewares.Auth().Verify,
-			controllers.Link().ListByUser)
+			controllers.Link().Create)
+		linkRoutes.PUT(
+			"/:link_id",
+			middlewares.Auth().Verify,
+			controllers.Link().Update)
+		linkRoutes.GET(
+			"/:link_id",
+			middlewares.Auth().Verify,
+			controllers.Link().Show)
+		linkRoutes.DELETE(
+			"/:link_id",
+			middlewares.Auth().Verify,
+			controllers.Link().Delete)
 	}
 }
 
