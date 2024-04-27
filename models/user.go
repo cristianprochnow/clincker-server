@@ -119,6 +119,26 @@ func show(id int) (*UserStruct, error) {
 	return &user, nil
 }
 
+func delete(id int) (bool, error) {
+	success := false
+	sql := db.Connect()
+	deleteResult, exception := sql.ExecContext(
+		context.Background(),
+		"DELETE FROM users WHERE id = %d", id)
+
+	if exception != nil {
+		return success, fmt.Errorf("models.users.delete: %s", exception.Error())
+	}
+
+	rowsAffected, _ := deleteResult.RowsAffected()
+
+	if rowsAffected > 0 {
+		success = true
+	}
+
+	return success, nil
+}
+
 func verify(email string) (*UserStruct, error) {
 	var user UserStruct
 
