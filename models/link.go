@@ -30,11 +30,19 @@ type LinkStruct struct {
 
 type LinkModel struct {
 	ListByUser func(userId int) ([]LinkStruct, error)
+	Create     func(link LinkInsertStruct) (int, error)
+	Update     func(link LinkInsertStruct, id int) (int, error)
+	Show       func(id int) (*LinkStruct, error)
+	Delete     func(id int) (bool, error)
 }
 
 func Link() LinkModel {
 	return LinkModel{
 		ListByUser: linkByUser,
+		Create:     createLink,
+		Update:     updateLink,
+		Show:       showLink,
+		Delete:     deleteLink,
 	}
 }
 
@@ -89,7 +97,7 @@ func linkByUser(userId int) ([]LinkStruct, error) {
 	return links, nil
 }
 
-func addLink(link LinkInsertStruct) (int, error) {
+func createLink(link LinkInsertStruct) (int, error) {
 	sql := db.Connect()
 
 	insertResult, exception := sql.ExecContext(
