@@ -87,10 +87,10 @@ func login(request *gin.Context) {
 		return
 	}
 
+	userHash, _ := models.User().GetHash(userExists.Id)
+
 	token, tokenError := utils.Crypto().Hash(
-		utils.User().GetLoginToken(
-			userExists.Email, userExists.Name,
-		),
+		utils.User().GetLoginToken(userHash),
 	)
 
 	if tokenError != nil {
