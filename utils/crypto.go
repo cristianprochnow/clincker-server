@@ -7,14 +7,14 @@ import (
 
 const cost int = 16
 
-type cryptoUtils struct {
+type CryptoUtils struct {
 	Cost   int
 	Hash   func(password string) (string, error)
 	Equals func(hashedPassword string, password string) bool
 }
 
-func Crypto() cryptoUtils {
-	return cryptoUtils{
+func Crypto() CryptoUtils {
+	return CryptoUtils{
 		Cost:   cost,
 		Hash:   hash,
 		Equals: equals,

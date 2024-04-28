@@ -24,10 +24,23 @@ func setup() {
 
 	userRoutes := router.Group("/user")
 	{
-		userRoutes.GET("/", controllers.User().List)
-		userRoutes.GET("/:id", controllers.User().Show)
+		userRoutes.GET(
+			"/",
+			middlewares.Auth().Verify,
+			controllers.User().List)
+		userRoutes.GET(
+			"/:id",
+			middlewares.Auth().Verify,
+			controllers.User().Show)
 		userRoutes.POST("/", controllers.User().Create)
-		userRoutes.PUT("/:id", controllers.User().Update)
+		userRoutes.PUT(
+			"/:id",
+			middlewares.Auth().Verify,
+			controllers.User().Update)
+		userRoutes.DELETE(
+			"/:id",
+			middlewares.Auth().Verify,
+			controllers.User().Delete)
 		userRoutes.POST("/login", controllers.User().Login)
 	}
 
@@ -37,6 +50,22 @@ func setup() {
 			"/user/:user_id",
 			middlewares.Auth().Verify,
 			controllers.Link().ListByUser)
+		linkRoutes.POST(
+			"/",
+			middlewares.Auth().Verify,
+			controllers.Link().Create)
+		linkRoutes.PUT(
+			"/:link_id",
+			middlewares.Auth().Verify,
+			controllers.Link().Update)
+		linkRoutes.GET(
+			"/:link_id",
+			middlewares.Auth().Verify,
+			controllers.Link().Show)
+		linkRoutes.DELETE(
+			"/:link_id",
+			middlewares.Auth().Verify,
+			controllers.Link().Delete)
 	}
 }
 

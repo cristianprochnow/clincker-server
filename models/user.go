@@ -2,8 +2,10 @@ package models
 
 import (
 	"clincker/db"
+	"clincker/utils"
 	"context"
 	"fmt"
+	"time"
 )
 
 type UserInsertStruct struct {
@@ -31,8 +33,10 @@ type UserModel struct {
 	Verify       func(email string) (*UserStruct, error)
 	Create       func(user UserInsertStruct) (int, error)
 	Update       func(user UserInsertStruct, id int) (int, error)
+	Delete       func(id int) (bool, error)
 	IsValid      func(dataSent UserInsertStruct) bool
 	IsValidLogin func(dataSent UserLogin) bool
+	GetHash      func(id int) (string, error)
 }
 
 type UserLogin struct {
@@ -51,9 +55,11 @@ func User() UserModel {
 		Show:         show,
 		Create:       create,
 		Update:       update,
+		Delete:       remove,
 		Verify:       verify,
 		IsValid:      isValidUser,
 		IsValidLogin: isValidLogin,
+		GetHash:      getHash,
 	}
 }
 
@@ -102,7 +108,10 @@ func show(id int) (*UserStruct, error) {
 
 	sql := db.Connect()
 	exception := sql.QueryRow(
-		"SELECT * FROM users WHERE users.id = ?", id,
+		"SELECT users.id, users.email, users.name,"+
+			"users.is_admin, users.password, users.created_at "+
+			"FROM users "+
+			"WHERE users.id = ?", id,
 	).Scan(
 		&user.Id,
 		&user.Email,
@@ -119,12 +128,12 @@ func show(id int) (*UserStruct, error) {
 	return &user, nil
 }
 
-func delete(id int) (bool, error) {
+func remove(id int) (bool, error) {
 	success := false
 	sql := db.Connect()
 	deleteResult, exception := sql.ExecContext(
 		context.Background(),
-		"DELETE FROM users WHERE id = %d", id)
+		"DELETE FROM users WHERE id = ?", id)
 
 	if exception != nil {
 		return success, fmt.Errorf("models.users.delete: %s", exception.Error())
@@ -144,7 +153,10 @@ func verify(email string) (*UserStruct, error) {
 
 	sql := db.Connect()
 	exception := sql.QueryRow(
-		"SELECT * FROM users WHERE users.email = ?", email,
+		"SELECT users.id, users.email, users.name, "+
+			"users.is_admin, users.password, users.created_at "+
+			"FROM users "+
+			"WHERE users.email = ?", email,
 	).Scan(
 		&user.Id,
 		&user.Email,
@@ -155,7 +167,7 @@ func verify(email string) (*UserStruct, error) {
 	)
 
 	if exception != nil {
-		return nil, fmt.Errorf("models.users.show: %s", exception.Error())
+		return nil, fmt.Errorf("models.users.verify: %s", exception.Error())
 	}
 
 	if user.Id != 0 {
@@ -173,8 +185,10 @@ func create(user UserInsertStruct) (int, error) {
 
 	insertResult, exception := sql.ExecContext(
 		context.Background(),
-		"INSERT INTO users(email, name, password) VALUES (?, ?, ?)",
-		user.Email, user.Name, user.Password)
+		"INSERT INTO users(email, name, password, hash) VALUES (?, ?, ?, ?)",
+		user.Email, user.Name, user.Password,
+		utils.User().GenerateHash(time.Now().String()),
+	)
 
 	if exception != nil {
 		return 0, fmt.Errorf("models.users.create: %s", exception.Error())
@@ -208,6 +222,23 @@ func update(user UserInsertStruct, id int) (int, error) {
 	}
 
 	return int(idExists), nil
+}
+
+func getHash(id int) (string, error) {
+	var hash string
+
+	sql := db.Connect()
+	exception := sql.QueryRow(
+		"SELECT user.hash FROM users WHERE users.id = ?", id,
+	).Scan(
+		&hash,
+	)
+
+	if exception != nil {
+		return "", fmt.Errorf("models.users.getHash: %s", exception.Error())
+	}
+
+	return hash, nil
 }
 
 func isValidUser(dataSent UserInsertStruct) bool {

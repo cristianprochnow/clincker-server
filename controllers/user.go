@@ -17,6 +17,7 @@ type UserController struct {
 	Show   func(request *gin.Context)
 	Create func(request *gin.Context)
 	Update func(request *gin.Context)
+	Delete func(request *gin.Context)
 }
 
 func User() UserController {
@@ -26,6 +27,7 @@ func User() UserController {
 		Show:   show,
 		Create: create,
 		Update: update,
+		Delete: remove,
 	}
 }
 
@@ -85,10 +87,10 @@ func login(request *gin.Context) {
 		return
 	}
 
+	userHash, _ := models.User().GetHash(userExists.Id)
+
 	token, tokenError := utils.Crypto().Hash(
-		utils.User().GetLoginToken(
-			userExists.Email, userExists.Name,
-		),
+		utils.User().GetLoginToken(userHash),
 	)
 
 	if tokenError != nil {
@@ -229,12 +231,19 @@ func create(request *gin.Context) {
 	userExists, exception := models.User().Verify(newUser.Email)
 
 	if userExists != nil {
+		message := ""
+
+		if exception != nil && exception.Error() != "" {
+			message = exception.Error()
+		}
+
 		request.IndentedJSON(http.StatusOK, response{
 			Resource: interfaces.Response{
 				Ok: false,
 				Message: fmt.Sprintf(
 					"Erro na inserção de usuário! [%s]",
-					exception.Error()),
+					message,
+				),
 			},
 			Data: models.NewUserResponseStruct{
 				Id: userExists.Id,
@@ -399,5 +408,52 @@ func update(request *gin.Context) {
 		Data: models.NewUserResponseStruct{
 			Id: value,
 		},
+	})
+}
+
+func remove(request *gin.Context) {
+	id := request.Param("id")
+	value, conversionError := strconv.Atoi(id)
+
+	if conversionError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: fmt.Sprintf("Valor de ID %s inválido!", id),
+		})
+
+		return
+	}
+
+	verificationUser, exception := models.User().Show(value)
+
+	if verificationUser == nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Usuário %d não encontrado na base de dados", value,
+			),
+		})
+
+		return
+	}
+
+	_, exception = models.User().Delete(value)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na Exclusão de usuário! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, interfaces.Response{
+		Ok: true,
+		Message: fmt.Sprintf(
+			"Usuário excluído com sucesso! [%d]", value,
+		),
 	})
 }

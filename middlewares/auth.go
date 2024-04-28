@@ -81,11 +81,11 @@ func verifyAuth(request *gin.Context) {
 		return
 	}
 
+	userHash, _ := models.User().GetHash(userIdFormat)
+
 	isValidCredentials := utils.Crypto().Equals(
 		userToken,
-		utils.User().GetLoginToken(
-			user.Email, user.Name,
-		),
+		utils.User().GetLoginToken(userHash),
 	)
 
 	if !isValidCredentials {
