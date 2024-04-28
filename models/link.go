@@ -51,8 +51,8 @@ func linkByUser(userId int) ([]LinkStruct, error) {
 
 	sql := db.Connect()
 	rows, exception := sql.Query(
-		"SELECT links.id, links.hash, lin.created_at, "+
-			"links.edited_at, links.original_url, links.domain, "+
+		"SELECT links.id, links.hash, links.created_at, "+
+			"COALESCE(links.edited_at, ''), links.original_url, links.domain, "+
 			"links.resources, links.protocol, links.user user_id, "+
 			"users.name user_name "+
 			"FROM links "+
@@ -153,7 +153,7 @@ func showLink(id int) (*LinkStruct, error) {
 	sql := db.Connect()
 	exception := sql.QueryRow(
 		"SELECT links.id, links.hash, lin.created_at, "+
-			"links.edited_at, links.original_url, links.domain, "+
+			"COALESCE(links.edited_at, ''), links.original_url, links.domain, "+
 			"links.resources, links.protocol, links.user user_id, "+
 			"users.name user_name "+
 			"FROM links "+

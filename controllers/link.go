@@ -29,6 +29,11 @@ func Link() LinkController {
 }
 
 func listByUserLink(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response `json:"resource"`
+		Data     []models.LinkStruct `json:"links"`
+	}
+
 	userId := request.Param("user_id")
 	userIdFormat, _ := strconv.Atoi(userId)
 
@@ -39,7 +44,7 @@ func listByUserLink(request *gin.Context) {
 
 		if utils.Log().IsNoRowsError(messageContent) {
 			messageContent = fmt.Sprintf(
-				"Usuário %d enviado no CLINCKER-USER não encontrado.",
+				"Usuário %d não encontrado.",
 				userIdFormat)
 		}
 
@@ -51,12 +56,40 @@ func listByUserLink(request *gin.Context) {
 		return
 	}
 
-	fmt.Println(user)
+	links, linksException := models.Link().ListByUser(user.Id)
 
-	request.IndentedJSON(http.StatusOK, interfaces.Response{
-		Ok: true,
-		Message: fmt.Sprintf(
-			"Rota de listagem de links do usuário %d!", userIdFormat),
+	fmt.Println(linksException)
+
+	if linksException != nil {
+		if utils.Log().IsNoRowsError(linksException.Error()) {
+			request.IndentedJSON(http.StatusOK, response{
+				Resource: interfaces.Response{
+					Ok: true,
+					Message: fmt.Sprintf(
+						"Links do usuário %d.", userIdFormat),
+				},
+				Data: links,
+			})
+
+			return
+		}
+
+		request.IndentedJSON(http.StatusBadRequest, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro ao buscar os links do usuário %d.", user.Id),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok: true,
+			Message: fmt.Sprintf(
+				"Links do usuário %d.", userIdFormat),
+		},
+		Data: links,
 	})
 }
 
