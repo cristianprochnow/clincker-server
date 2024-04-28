@@ -58,8 +58,6 @@ func listByUserLink(request *gin.Context) {
 
 	links, linksException := models.Link().ListByUser(user.Id)
 
-	fmt.Println(linksException)
-
 	if linksException != nil {
 		if utils.Log().IsNoRowsError(linksException.Error()) {
 			request.IndentedJSON(http.StatusOK, response{
