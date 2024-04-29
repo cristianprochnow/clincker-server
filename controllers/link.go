@@ -169,7 +169,7 @@ func createLink(request *gin.Context) {
 func updateLink(request *gin.Context) {
 	type response struct {
 		Resource interfaces.Response          `json:"resource"`
-		Data     models.NewLinkResponseStruct `json:"user"`
+		Data     models.NewLinkResponseStruct `json:"link"`
 	}
 
 	id := request.Param("link_id")
@@ -311,4 +311,56 @@ func deleteLink(request *gin.Context) {
 	})
 }
 
-func showLink(request *gin.Context) {}
+func showLink(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response `json:"resource"`
+		Data     *models.LinkStruct  `json:"link"`
+	}
+
+	id := request.Param("link_id")
+	value, conversionError := strconv.Atoi(id)
+
+	if conversionError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: fmt.Sprintf("Valor de ID %s inválido!", id),
+		})
+
+		return
+	}
+
+	link, exception := models.Link().Show(value)
+
+	if exception != nil {
+		if utils.Log().IsNoRowsError(exception.Error()) {
+			request.IndentedJSON(http.StatusOK, response{
+				Resource: interfaces.Response{
+					Ok: true,
+					Message: fmt.Sprintf(
+						"Rota de Info de Link com código %s!", value),
+				},
+				Data: nil,
+			})
+
+			return
+		}
+
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na consulta de link! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok: true,
+			Message: fmt.Sprintf(
+				"Rota de Info de Link com código %d!", value),
+		},
+		Data: link,
+	})
+}
