@@ -166,7 +166,102 @@ func createLink(request *gin.Context) {
 	})
 }
 
-func updateLink(request *gin.Context) {}
+func updateLink(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response          `json:"resource"`
+		Data     models.NewLinkResponseStruct `json:"user"`
+	}
+
+	id := request.Param("link_id")
+	value, conversionError := strconv.Atoi(id)
+
+	if conversionError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: fmt.Sprintf("Valor de ID %s inválido!", id),
+		})
+
+		return
+	}
+
+	verificationLink, exception := models.Link().Show(value)
+
+	if verificationLink == nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Link %d não encontrado na base de dados", value,
+			),
+		})
+
+		return
+	}
+
+	var linkExists models.LinkInsertStruct
+
+	requestError := request.BindJSON(&linkExists)
+
+	if requestError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Formato inválido de JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	if !models.Link().IsValid(linkExists) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Campos obrigatórios faltando no JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	userExists, _ := models.User().Show(linkExists.User)
+
+	if userExists == nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Usuário %d não encontrado.", linkExists.User,
+			),
+		})
+
+		return
+	}
+
+	_, exception = models.Link().Update(linkExists, value)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na Atualização do link %d! [%s]",
+				value, exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok: true,
+			Message: fmt.Sprintf(
+				"Rota de Atualização de Link com código %d!", value),
+		},
+		Data: models.NewLinkResponseStruct{
+			Id:   value,
+			Hash: linkExists.Hash,
+		},
+	})
+}
 
 func deleteLink(request *gin.Context) {}
 
