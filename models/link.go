@@ -109,7 +109,7 @@ func createLink(link LinkInsertStruct) (int, error) {
 
 	insertResult, exception := sql.ExecContext(
 		context.Background(),
-		"INSERT INTO users("+
+		"INSERT INTO links("+
 			"hash, original_url, domain, resources, protocol, user"+
 			") VALUES (?, ?, ?, ?, ?, ?)",
 		link.Hash, link.OriginalUrl, link.Domain,
