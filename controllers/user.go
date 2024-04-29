@@ -202,9 +202,9 @@ func create(request *gin.Context) {
 		Data     models.NewUserResponseStruct `json:"user"`
 	}
 
-	var newUser models.UserInsertStruct
+	var newLink models.LinkInsertStruct
 
-	requestError := request.BindJSON(&newUser)
+	requestError := request.BindJSON(&newLink)
 
 	if requestError != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
@@ -217,7 +217,7 @@ func create(request *gin.Context) {
 		return
 	}
 
-	if !models.User().IsValid(newUser) {
+	if !models.Link().IsValid(newLink) {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
@@ -228,26 +228,15 @@ func create(request *gin.Context) {
 		return
 	}
 
-	userExists, exception := models.User().Verify(newUser.Email)
+	userExists, exception := models.User().Show(newLink.User)
 
-	if userExists != nil {
-		message := ""
-
-		if exception != nil && exception.Error() != "" {
-			message = exception.Error()
-		}
-
-		request.IndentedJSON(http.StatusOK, response{
-			Resource: interfaces.Response{
-				Ok: false,
-				Message: fmt.Sprintf(
-					"Erro na inserção de usuário! [%s]",
-					message,
-				),
-			},
-			Data: models.NewUserResponseStruct{
-				Id: userExists.Id,
-			},
+	if exception != nil || userExists == nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Usuário %d não encontrado na base de dados",
+				newLink.User,
+			),
 		})
 
 		return

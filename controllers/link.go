@@ -91,7 +91,102 @@ func listByUserLink(request *gin.Context) {
 	})
 }
 
-func createLink(request *gin.Context) {}
+func createLink(request *gin.Context) {
+	type response struct {
+		Resource interfaces.Response          `json:"resource"`
+		Data     models.NewLinkResponseStruct `json:"link"`
+	}
+
+	var newUser models.UserInsertStruct
+
+	requestError := request.BindJSON(&newUser)
+
+	if requestError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Formato inválido de JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	if !models.User().IsValid(newUser) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Campos obrigatórios faltando no JSON enviado.",
+			),
+		})
+
+		return
+	}
+
+	userExists, exception := models.User().Verify(newUser.Email)
+
+	if userExists != nil {
+		message := ""
+
+		if exception != nil && exception.Error() != "" {
+			message = exception.Error()
+		}
+
+		request.IndentedJSON(http.StatusOK, response{
+			Resource: interfaces.Response{
+				Ok: false,
+				Message: fmt.Sprintf(
+					"Erro na inserção de usuário! [%s]",
+					message,
+				),
+			},
+			Data: models.NewUserResponseStruct{
+				Id: userExists.Id,
+			},
+		})
+
+		return
+	}
+
+	hashedPassword, exception := utils.Crypto().Hash(newUser.Password)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na inserção de usuário! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	newUser.Password = hashedPassword
+
+	id, exception := models.User().Create(newUser)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na inserção de usuário! [%s]", exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, response{
+		Resource: interfaces.Response{
+			Ok: true,
+			Message: fmt.Sprintf(
+				"Rota de Inserção de Usuário com código %d!", id),
+		},
+		Data: models.NewUserResponseStruct{
+			Id: id,
+		},
+	})
+}
 
 func updateLink(request *gin.Context) {}
 

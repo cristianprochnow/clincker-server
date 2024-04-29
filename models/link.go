@@ -28,12 +28,18 @@ type LinkStruct struct {
 	UserName    string `json:"user_name"`
 }
 
+type NewLinkResponseStruct struct {
+	Id   int    `json:"id"`
+	Hash string `json:"hash"`
+}
+
 type LinkModel struct {
 	ListByUser func(userId int) ([]LinkStruct, error)
 	Create     func(link LinkInsertStruct) (int, error)
 	Update     func(link LinkInsertStruct, id int) (int, error)
 	Show       func(id int) (*LinkStruct, error)
 	Delete     func(id int) (bool, error)
+	IsValid    func(dataSent LinkInsertStruct) bool
 }
 
 func Link() LinkModel {
@@ -43,6 +49,7 @@ func Link() LinkModel {
 		Update:     updateLink,
 		Show:       showLink,
 		Delete:     deleteLink,
+		IsValid:    isValidLink,
 	}
 }
 
@@ -197,4 +204,13 @@ func deleteLink(id int) (bool, error) {
 	}
 
 	return success, nil
+}
+
+func isValidLink(dataSent LinkInsertStruct) bool {
+	return dataSent.User != 0 &&
+		dataSent.Hash != "" &&
+		dataSent.OriginalUrl != "" &&
+		dataSent.Domain != "" &&
+		dataSent.Resources != "" &&
+		dataSent.Protocol != ""
 }
