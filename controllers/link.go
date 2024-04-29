@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type LinkController struct {
@@ -97,9 +98,9 @@ func createLink(request *gin.Context) {
 		Data     models.NewLinkResponseStruct `json:"link"`
 	}
 
-	var newUser models.UserInsertStruct
+	var newLink models.LinkInsertStruct
 
-	requestError := request.BindJSON(&newUser)
+	requestError := request.BindJSON(&newLink)
 
 	if requestError != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
@@ -112,7 +113,7 @@ func createLink(request *gin.Context) {
 		return
 	}
 
-	if !models.User().IsValid(newUser) {
+	if !models.Link().IsValid(newLink) {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
@@ -123,53 +124,29 @@ func createLink(request *gin.Context) {
 		return
 	}
 
-	userExists, exception := models.User().Verify(newUser.Email)
+	userExists, _ := models.User().Show(newLink.User)
 
-	if userExists != nil {
-		message := ""
-
-		if exception != nil && exception.Error() != "" {
-			message = exception.Error()
-		}
-
-		request.IndentedJSON(http.StatusOK, response{
-			Resource: interfaces.Response{
-				Ok: false,
-				Message: fmt.Sprintf(
-					"Erro na inserção de usuário! [%s]",
-					message,
-				),
-			},
-			Data: models.NewUserResponseStruct{
-				Id: userExists.Id,
-			},
-		})
-
-		return
-	}
-
-	hashedPassword, exception := utils.Crypto().Hash(newUser.Password)
-
-	if exception != nil {
+	if userExists == nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
-				"Erro na inserção de usuário! [%s]", exception.Error(),
+				"Usuário %d não encontrado.", newLink.User,
 			),
 		})
 
 		return
 	}
 
-	newUser.Password = hashedPassword
+	newLink.Hash = utils.Link().GenerateHash(time.Now().String())
 
-	id, exception := models.User().Create(newUser)
+	id, exception := models.Link().Create(newLink)
 
 	if exception != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
-				"Erro na inserção de usuário! [%s]", exception.Error(),
+				"Erro na inserção de link do usuário %d! [%s]",
+				newLink.User, exception.Error(),
 			),
 		})
 
@@ -182,8 +159,9 @@ func createLink(request *gin.Context) {
 			Message: fmt.Sprintf(
 				"Rota de Inserção de Usuário com código %d!", id),
 		},
-		Data: models.NewUserResponseStruct{
-			Id: id,
+		Data: models.NewLinkResponseStruct{
+			Id:   id,
+			Hash: newLink.Hash,
 		},
 	})
 }

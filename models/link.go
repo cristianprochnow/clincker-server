@@ -208,7 +208,6 @@ func deleteLink(id int) (bool, error) {
 
 func isValidLink(dataSent LinkInsertStruct) bool {
 	return dataSent.User != 0 &&
-		dataSent.Hash != "" &&
 		dataSent.OriginalUrl != "" &&
 		dataSent.Domain != "" &&
 		dataSent.Resources != "" &&
