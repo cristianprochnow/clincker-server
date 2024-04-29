@@ -263,6 +263,52 @@ func updateLink(request *gin.Context) {
 	})
 }
 
-func deleteLink(request *gin.Context) {}
+func deleteLink(request *gin.Context) {
+	id := request.Param("link_id")
+	value, conversionError := strconv.Atoi(id)
+
+	if conversionError != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: fmt.Sprintf("Valor de ID %s inválido!", id),
+		})
+
+		return
+	}
+
+	verificationLink, exception := models.Link().Show(value)
+
+	if verificationLink == nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Link %d não encontrado na base de dados", value,
+			),
+		})
+
+		return
+	}
+
+	_, exception = models.Link().Delete(value)
+
+	if exception != nil {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Erro na Exclusão de link %d! [%s]",
+				value, exception.Error(),
+			),
+		})
+
+		return
+	}
+
+	request.IndentedJSON(http.StatusOK, interfaces.Response{
+		Ok: true,
+		Message: fmt.Sprintf(
+			"Link excluído com sucesso! [%d]", value,
+		),
+	})
+}
 
 func showLink(request *gin.Context) {}
