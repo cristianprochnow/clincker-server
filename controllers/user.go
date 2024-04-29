@@ -208,10 +208,8 @@ func create(request *gin.Context) {
 
 	if requestError != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
-			Ok: false,
-			Message: fmt.Sprintf(
-				"Formato inválido de JSON enviado.",
-			),
+			Ok:      false,
+			Message: "Formato inválido de JSON enviado.",
 		})
 
 		return
@@ -219,10 +217,8 @@ func create(request *gin.Context) {
 
 	if !models.User().IsValid(newUser) {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
-			Ok: false,
-			Message: fmt.Sprintf(
-				"Campos obrigatórios faltando no JSON enviado.",
-			),
+			Ok:      false,
+			Message: "Campos obrigatórios faltando no JSON enviado.",
 		})
 
 		return
