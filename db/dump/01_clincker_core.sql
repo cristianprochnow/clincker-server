@@ -16,7 +16,7 @@ CREATE TABLE `users` (
 
 CREATE TABLE `links` (
      `id` int(11) NOT NULL AUTO_INCREMENT,
-     `hash` varchar(64) COLLATE utf8_bin NOT NULL,
+     `hash` varchar(32) COLLATE utf8_bin NOT NULL,
      `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
      `edited_at` datetime DEFAULT NULL,
      `original_url` varchar(100) COLLATE utf8_bin DEFAULT NULL,
