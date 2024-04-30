@@ -134,10 +134,10 @@ func updateLink(link LinkInsertStruct, id int) (int, error) {
 	insertResult, exception := sql.ExecContext(
 		context.Background(),
 		"UPDATE links "+
-			"SET hash = ?, original_url = ?, domain = ?, "+
+			"SET original_url = ?, domain = ?, "+
 			"resources = ?, protocol = ?, user = ?, edited_at = NOW()"+
 			"WHERE id = ?",
-		link.Hash, link.OriginalUrl, link.Domain,
+		link.OriginalUrl, link.Domain,
 		link.Resources, link.Protocol, link.User,
 		id)
 
@@ -159,7 +159,7 @@ func showLink(id int) (*LinkStruct, error) {
 
 	sql := db.Connect()
 	exception := sql.QueryRow(
-		"SELECT links.id, links.hash, lin.created_at, "+
+		"SELECT links.id, links.hash, links.created_at, "+
 			"COALESCE(links.edited_at, ''), links.original_url, links.domain, "+
 			"links.resources, links.protocol, links.user user_id, "+
 			"users.name user_name "+
@@ -191,7 +191,7 @@ func deleteLink(id int) (bool, error) {
 	sql := db.Connect()
 	deleteResult, exception := sql.ExecContext(
 		context.Background(),
-		"DELETE FROM links WHERE id = %d", id)
+		"DELETE FROM links WHERE id = ?", id)
 
 	if exception != nil {
 		return success, fmt.Errorf("models.users.delete: %s", exception.Error())

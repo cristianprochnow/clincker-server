@@ -187,10 +187,17 @@ func updateLink(request *gin.Context) {
 	verificationLink, exception := models.Link().Show(value)
 
 	if verificationLink == nil {
+		verificationLinkMessage := ""
+
+		if exception != nil {
+			verificationLinkMessage = exception.Error()
+		}
+
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
-				"Link %d não encontrado na base de dados", value,
+				"Link %d não encontrado na base de dados [%s]",
+				value, verificationLinkMessage,
 			),
 		})
 
@@ -258,7 +265,7 @@ func updateLink(request *gin.Context) {
 		},
 		Data: models.NewLinkResponseStruct{
 			Id:   value,
-			Hash: linkExists.Hash,
+			Hash: verificationLink.Hash,
 		},
 	})
 }
@@ -337,7 +344,7 @@ func showLink(request *gin.Context) {
 				Resource: interfaces.Response{
 					Ok: true,
 					Message: fmt.Sprintf(
-						"Rota de Info de Link com código %s!", value),
+						"Rota de Info de Link com código %d!", value),
 				},
 				Data: nil,
 			})
