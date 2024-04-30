@@ -13,7 +13,7 @@ O principal objetivo é proporcionar uma sequência de rotas e recursos para que
 
 Então após cadastrar as URLs, o usuário terá também recurso para obter informações mais detalhadas e também validação dos _hashes_ criados no processamento.
 
-![Diagrama de Funcionamento da API](.github/clincker-server.jpg)
+![Diagrama de Funcionamento da API](./.github/clincker-server.jpg)
 
 ### Escopo
 
@@ -51,3 +51,7 @@ Agora, basta então abrir o terminal e rodar o comando para rodar os contêinere
 ```bash
 $ docker compose up
 ```
+
+E então só começar a rodar as rotas conforme a [Documentação][postman-docs]. 🎉
+
+[postman-docs]: https://documenter.getpostman.com/view/34122525/2sA3JDg4wK
