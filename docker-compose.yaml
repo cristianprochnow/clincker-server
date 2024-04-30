@@ -2,9 +2,7 @@ version: "3"
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: App.Dockerfile
+    build: .
     ports:
       - ${APP_PORT}:8080
     volumes:
@@ -15,9 +13,7 @@ services:
       - database
 
   database:
-    build:
-      context: .
-      dockerfile: Database.Dockerfile
+    image: mysql:5.7
     ports:
       - ${DB_PORT}:3306
     environment:
