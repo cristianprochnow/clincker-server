@@ -4,6 +4,7 @@ import (
 	"clincker/controllers"
 	"clincker/middlewares"
 	"clincker/utils"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,25 +21,32 @@ func boot() {
 }
 
 func setup() {
-	router.GET("/", controllers.Hello().Hello)
+	router.GET(
+		"/",
+		middlewares.CORS().Unleash,
+		controllers.Hello().Hello)
 
 	userRoutes := router.Group("/user")
 	{
 		userRoutes.GET(
 			"/",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.User().List)
 		userRoutes.GET(
 			"/:id",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.User().Show)
 		userRoutes.POST("/", controllers.User().Create)
 		userRoutes.PUT(
 			"/:id",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.User().Update)
 		userRoutes.DELETE(
 			"/:id",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.User().Delete)
 		userRoutes.POST("/login", controllers.User().Login)
@@ -48,22 +56,27 @@ func setup() {
 	{
 		linkRoutes.GET(
 			"/user/:user_id",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.Link().ListByUser)
 		linkRoutes.POST(
 			"/",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.Link().Create)
 		linkRoutes.PUT(
 			"/:link_id",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.Link().Update)
 		linkRoutes.GET(
 			"/:link_id",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.Link().Show)
 		linkRoutes.DELETE(
 			"/:link_id",
+			middlewares.CORS().Unleash,
 			middlewares.Auth().Verify,
 			controllers.Link().Delete)
 	}
