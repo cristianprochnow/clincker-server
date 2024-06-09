@@ -4,6 +4,8 @@ import (
 	"clincker/controllers"
 	"clincker/middlewares"
 	"clincker/utils"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,12 +17,38 @@ func Start() {
 	listen()
 }
 
+func buildConfig() cors.Config {
+	config := cors.DefaultConfig()
+
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS", "DELETE"}
+	config.AllowHeaders = []string{
+		"Origin",
+		"Content-Type",
+		"Authorization",
+		"Accept",
+		"User-Agent",
+		"Cache-Control",
+		"Pragma",
+		"CLINCKER-USER",
+		"CLINCKER-TOKEN",
+	}
+	config.ExposeHeaders = []string{"Content-Length"}
+	config.AllowCredentials = true
+
+	return config
+}
+
 func boot() {
 	router = gin.New()
+
+	router.Use(cors.New(buildConfig()))
 }
 
 func setup() {
-	router.GET("/", controllers.Hello().Hello)
+	router.GET(
+		"/",
+		controllers.Hello().Hello)
 
 	userRoutes := router.Group("/user")
 	{
