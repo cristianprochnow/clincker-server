@@ -22,7 +22,17 @@ func buildConfig() cors.Config {
 
 	config.AllowAllOrigins = true
 	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS", "DELETE"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
+	config.AllowHeaders = []string{
+		"Origin",
+		"Content-Type",
+		"Authorization",
+		"Accept",
+		"User-Agent",
+		"Cache-Control",
+		"Pragma",
+		"CLINCKER-USER",
+		"CLINCKER-TOKEN",
+	}
 	config.ExposeHeaders = []string{"Content-Length"}
 	config.AllowCredentials = true
 
