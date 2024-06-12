@@ -43,10 +43,8 @@ func login(request *gin.Context) {
 
 	if requestError != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
-			Ok: false,
-			Message: fmt.Sprintf(
-				"Formato inválido de JSON enviado.",
-			),
+			Ok:      false,
+			Message: "Formato inválido de JSON enviado.",
 		})
 
 		return
@@ -54,9 +52,27 @@ func login(request *gin.Context) {
 
 	if !models.User().IsValidLogin(user) {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: "Campos obrigatórios faltando no JSON enviado.",
+		})
+
+		return
+	}
+
+	if !utils.User().IsValidEmail(user.Email) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: "Formato do e-mail enviado é inválido.",
+		})
+
+		return
+	}
+
+	if utils.User().IsTooLongPass(user.Password) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok: false,
 			Message: fmt.Sprintf(
-				"Campos obrigatórios faltando no JSON enviado.",
+				"Senha deve ter no máximo %d caracteres.", utils.User().PassSize,
 			),
 		})
 
@@ -67,10 +83,8 @@ func login(request *gin.Context) {
 
 	if userExists == nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
-			Ok: false,
-			Message: fmt.Sprintf(
-				"Usuário não encontrado no banco de dados.",
-			),
+			Ok:      false,
+			Message: "Usuário não encontrado no banco de dados.",
 		})
 
 		return
@@ -81,7 +95,7 @@ func login(request *gin.Context) {
 	if !matches {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok:      false,
-			Message: fmt.Sprintf("Usuário ou senha inválidos"),
+			Message: "Usuário ou senha inválidos",
 		})
 
 		return
@@ -219,6 +233,26 @@ func create(request *gin.Context) {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
 			Ok:      false,
 			Message: "Campos obrigatórios faltando no JSON enviado.",
+		})
+
+		return
+	}
+
+	if !utils.User().IsValidEmail(newUser.Email) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok:      false,
+			Message: "Formato do e-mail enviado é inválido.",
+		})
+
+		return
+	}
+
+	if utils.User().IsTooLongPass(newUser.Password) {
+		request.IndentedJSON(http.StatusOK, interfaces.Response{
+			Ok: false,
+			Message: fmt.Sprintf(
+				"Senha deve ter no máximo %d caracteres.", utils.User().PassSize,
+			),
 		})
 
 		return
