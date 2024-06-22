@@ -19,7 +19,18 @@ func Start() {
 
 func boot() {
 	router = gin.Default()
-	router.Use(cors.Default())
+
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{
+		"Origin",
+		"Content-Length",
+		"Content-Type",
+		"CLINCKER-TOKEN",
+		"CLINCKER-USER",
+	}
+	router.Use(cors.New(config))
+
 }
 
 func setup() {
