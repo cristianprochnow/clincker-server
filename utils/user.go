@@ -11,6 +11,7 @@ type UserUtil struct {
 	IsValidEmail  func(email string) bool
 	IsTooLongPass func(password string) bool
 	PassSize      int
+	NoPassValue   string
 }
 
 func User() UserUtil {
@@ -20,10 +21,12 @@ func User() UserUtil {
 		IsValidEmail:  isValidEmail,
 		IsTooLongPass: isTooLongPassword,
 		PassSize:      PASS_SIZE,
+		NoPassValue:   NO_PASS_VALUE,
 	}
 }
 
 const PASS_SIZE int = 16
+const NO_PASS_VALUE string = "NO-PASS"
 
 func getLoginToken(hash string) string {
 	return hash + os.Getenv("TOKEN_SECRET")

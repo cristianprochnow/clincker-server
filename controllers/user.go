@@ -401,7 +401,14 @@ func update(request *gin.Context) {
 		return
 	}
 
-	hashedPassword, exception := utils.Crypto().Hash(userExists.Password)
+	var hashedPassword string
+	exception = nil
+
+	if userExists.Password == utils.NO_PASS_VALUE {
+		hashedPassword = verificationUser.Password
+	} else {
+		hashedPassword, exception = utils.Crypto().Hash(userExists.Password)
+	}
 
 	if exception != nil {
 		request.IndentedJSON(http.StatusOK, interfaces.Response{
