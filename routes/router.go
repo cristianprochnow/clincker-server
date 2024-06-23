@@ -29,8 +29,8 @@ func boot() {
 		"CLINCKER-TOKEN",
 		"CLINCKER-USER",
 	}
-	router.Use(cors.New(config))
 
+	router.Use(cors.New(config))
 }
 
 func setup() {
